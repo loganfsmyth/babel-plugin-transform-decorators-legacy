@@ -5,7 +5,7 @@ const buildClassDecorator = template(`
 `);
 
 const buildPropertyDecorator = template(`
-  DESC = (DECORATOR(TARGET, PROPERTY, DESC = INNER) || DESC);
+  DECORATOR(TARGET, PROPERTY, DESC = INNER) || DESC;
 `);
 
 const buildClassPrototype = template(`
