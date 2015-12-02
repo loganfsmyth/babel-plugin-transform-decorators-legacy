@@ -135,89 +135,88 @@ export default function({types: t}){
 
             const property = t.stringLiteral(node.key.name);
 
+            let buildDecoratorCall = function(descriptor, expr){
+                return buildPropertyDecorator({
+                    TARGET: target,
+                    DECORATOR: expr,
+                    DESC: descName,
+                    INNER: descriptor,
+                    PROPERTY: property,
+                }).expression;
+            };
+            let buildDescriptorCreate;
+            let buildDescriptorStore;
 
             if (t.isObjectProperty(node)){
-                const init = path.scope.generateDeclaredUidIdentifier('init');
+                // Read value from object and store in temp to be read from initializer.
+                buildDescriptorCreate = function(){
+                    return buildGetObjectInitializer({
+                        TEMP: path.scope.generateDeclaredUidIdentifier('init'),
+                        TARGET: target,
+                        PROPERTY: property
+                    }).expression;
+                };
 
-                return acc.concat(
-                    decorators
-                        .map(dec => dec.expression)
-                        .reverse()
-                        .reduce(function(descriptor, expr){
-                            return buildPropertyDecorator({
-                                TARGET: target,
-                                DECORATOR: expr,
-                                DESC: descName,
-                                INNER: descriptor,
-                                PROPERTY: property,
-                            }).expression;
-                        }, buildGetObjectInitializer({
-                            TEMP: init,
-                            TARGET: target,
-                            PROPERTY: property
-                        }).expression),
-                    buildSetObjectInitializer({
+                // Trigger initializer and set descriptor.
+                buildDescriptorStore = function(){
+                    return buildSetObjectInitializer({
                         TARGET: target,
                         PROPERTY: property,
                         DESC: descName,
-                    }).expression
-                );
+                    }).expression;
+                };
             } else if (t.isClassProperty(node)){
                 let init = path.scope.generateDeclaredUidIdentifier('init');
                 let oldInitializer;
                 if (node.value){
+                    // Move the initializer to a temp variable and reassign to new temp.
                     oldInitializer = node.value;
-
                     acc.push(t.assignmentExpression('=', init, t.functionExpression(null, [], t.blockStatement([
                         t.returnStatement(oldInitializer),
                     ]))));
                 }
                 node.value = t.callExpression(t.memberExpression(init, t.identifier('apply')), [t.thisExpression()]);
 
-                return acc.concat(
-                    decorators
-                        .map(dec => dec.expression)
-                        .reverse()
-                        .reduce(function(descriptor, expr){
-                            return buildPropertyDecorator({
-                                TARGET: target,
-                                DECORATOR: expr,
-                                DESC: descName,
-                                INNER: descriptor,
-                                PROPERTY: property,
-                            }).expression;
-                        }, buildGetClassInitializer({
-                            INIT: oldInitializer ? init : t.nullLiteral(),
-                        }).expression),
-                    buildSetClassInitializer({
+                // Create initializer that reads from new temp.
+                buildDescriptorCreate = function(){
+                    return buildGetClassInitializer({
+                        INIT: oldInitializer ? init : t.nullLiteral(),
+                    }).expression;
+                };
+
+                // Trigger initializer and set descriptor.
+                buildDescriptorStore = function(){
+                    return buildSetClassInitializer({
                         INIT: init,
                         DESC: descName,
-                    }).expression
-                );
+                    }).expression;
+                };
             } else {
-                return acc.concat(
-                    decorators
-                        .map(dec => dec.expression)
-                        .reverse()
-                        .reduce(function(descriptor, expr){
-                            return buildPropertyDecorator({
-                                TARGET: target,
-                                DECORATOR: expr,
-                                DESC: descName,
-                                INNER: descriptor,
-                                PROPERTY: property,
-                            }).expression;
-                        }, buildGetDescriptor({
-                            TARGET: target,
-                            PROPERTY: property,
-                        }).expression),
-                    buildSetDescriptor({
+                // Read descriptor normally.
+                buildDescriptorCreate = function(){
+                    return buildGetDescriptor({
+                        TARGET: target,
+                        PROPERTY: property,
+                    }).expression;
+                };
+
+                // Store descriptor normally.
+                buildDescriptorStore = function(){
+                    return buildSetDescriptor({
                         TARGET: target,
                         PROPERTY: property,
                         DESC: descName,
-                    }).expression
-                );
+                    }).expression;
+                };
             }
+
+            return acc.concat(
+                decorators
+                    .map(dec => dec.expression)
+                    .reverse()
+                    .reduce(buildDecoratorCall, buildDescriptorCreate()),
+                buildDescriptorStore()
+            );
         }, []))
     }
 
