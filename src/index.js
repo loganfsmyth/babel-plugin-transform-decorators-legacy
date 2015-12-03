@@ -5,7 +5,7 @@ const buildClassDecorator = template(`
 `);
 
 const buildPropertyDecorator = template(`
-  DECORATOR(TARGET, PROPERTY, DESC = INNER) || DESC;
+  DESC = DECORATOR(TARGET, PROPERTY, INNER) || DESC;
 `);
 
 const buildClassPrototype = template(`
@@ -214,7 +214,7 @@ export default function({types: t}){
                 decorators
                     .map(dec => dec.expression)
                     .reverse()
-                    .reduce(buildDecoratorCall, buildDescriptorCreate()),
+                    .reduce(buildDecoratorCall, t.assignmentExpression('=', descName, buildDescriptorCreate())),
                 buildDescriptorStore()
             );
         }, []))
