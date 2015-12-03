@@ -96,7 +96,7 @@ describe('decorators', function(){
             });
         });
 
-        describe('methods', function(){
+        describe('prototype methods', function(){
             it('should allow returning a descriptor', function(){
                 function dec(target, name, descriptor){
                     let value = descriptor.value;
@@ -291,6 +291,202 @@ describe('decorators', function(){
                 expect(descs._.writable).to.be.false;
                 expect(descs._.configurable).to.be.false;
                 expect(inst._()).to.eql('__8__');
+            });
+        });
+
+        describe('static methods', function(){
+            it('should allow returning a descriptor', function(){
+                function dec(target, name, descriptor){
+                    let value = descriptor.value;
+                    return {
+                        enumerable: name.indexOf('enum') !== -1,
+                        configurable: name.indexOf('conf') !== -1,
+                        writable: name.indexOf('write') !== -1,
+                        value: function(...args){
+                            return '__' + value.apply(this, args) + '__';
+                        },
+                    };
+                }
+
+                class Example {
+                    @dec
+                    static enumconfwrite(){
+                        return 1;
+                    }
+
+                    @dec
+                    static enumconf(){
+                        return 2;
+                    }
+
+                    @dec
+                    static enumwrite(){
+                        return 3;
+                    }
+
+                    @dec
+                    static enum(){
+                        return 4;
+                    }
+
+                    @dec
+                    static confwrite(){
+                        return 5;
+                    }
+
+                    @dec
+                    static conf(){
+                        return 6;
+                    }
+
+                    @dec
+                    static write(){
+                        return 7;
+                    }
+
+                    @dec
+                    static _(){
+                        return 8;
+                    }
+                }
+
+                const descs = Object.getOwnPropertyDescriptors(Example);
+                expect(descs.enumconfwrite.enumerable).to.be.true;
+                expect(descs.enumconfwrite.writable).to.be.true;
+                expect(descs.enumconfwrite.configurable).to.be.true;
+                expect(Example.enumconfwrite()).to.eql('__1__');
+
+                expect(descs.enumconf.enumerable).to.be.true;
+                expect(descs.enumconf.writable).to.be.false;
+                expect(descs.enumconf.configurable).to.be.true;
+                expect(Example.enumconf()).to.eql('__2__');
+
+                expect(descs.enumwrite.enumerable).to.be.true;
+                expect(descs.enumwrite.writable).to.be.true;
+                expect(descs.enumwrite.configurable).to.be.false;
+                expect(Example.enumwrite()).to.eql('__3__');
+
+                expect(descs.enum.enumerable).to.be.true;
+                expect(descs.enum.writable).to.be.false;
+                expect(descs.enum.configurable).to.be.false;
+                expect(Example.enum()).to.eql('__4__');
+
+                expect(descs.confwrite.enumerable).to.be.false;
+                expect(descs.confwrite.writable).to.be.true;
+                expect(descs.confwrite.configurable).to.be.true;
+                expect(Example.confwrite()).to.eql('__5__');
+
+                expect(descs.conf.enumerable).to.be.false;
+                expect(descs.conf.writable).to.be.false;
+                expect(descs.conf.configurable).to.be.true;
+                expect(Example.conf()).to.eql('__6__');
+
+                expect(descs.write.enumerable).to.be.false;
+                expect(descs.write.writable).to.be.true;
+                expect(descs.write.configurable).to.be.false;
+                expect(Example.write()).to.eql('__7__');
+
+                expect(descs._.enumerable).to.be.false;
+                expect(descs._.writable).to.be.false;
+                expect(descs._.configurable).to.be.false;
+                expect(Example._()).to.eql('__8__');
+            });
+
+            it('should allow mutating the original descriptor', function(){
+                function dec(target, name, descriptor){
+                    let value = descriptor.value;
+                    Object.assign(descriptor, {
+                        enumerable: name.indexOf('enum') !== -1,
+                        configurable: name.indexOf('conf') !== -1,
+                        writable: name.indexOf('write') !== -1,
+                        value: function(...args){
+                            return '__' + value.apply(this, args) + '__';
+                        },
+                    });
+                }
+
+                class Example {
+                    @dec
+                    static enumconfwrite(){
+                        return 1;
+                    }
+
+                    @dec
+                    static enumconf(){
+                        return 2;
+                    }
+
+                    @dec
+                    static enumwrite(){
+                        return 3;
+                    }
+
+                    @dec
+                    static enum(){
+                        return 4;
+                    }
+
+                    @dec
+                    static confwrite(){
+                        return 5;
+                    }
+
+                    @dec
+                    static conf(){
+                        return 6;
+                    }
+
+                    @dec
+                    static write(){
+                        return 7;
+                    }
+
+                    @dec
+                    static _(){
+                        return 8;
+                    }
+                }
+
+                const descs = Object.getOwnPropertyDescriptors(Example);
+                expect(descs.enumconfwrite.enumerable).to.be.true;
+                expect(descs.enumconfwrite.writable).to.be.true;
+                expect(descs.enumconfwrite.configurable).to.be.true;
+                expect(Example.enumconfwrite()).to.eql('__1__');
+
+                expect(descs.enumconf.enumerable).to.be.true;
+                expect(descs.enumconf.writable).to.be.false;
+                expect(descs.enumconf.configurable).to.be.true;
+                expect(Example.enumconf()).to.eql('__2__');
+
+                expect(descs.enumwrite.enumerable).to.be.true;
+                expect(descs.enumwrite.writable).to.be.true;
+                expect(descs.enumwrite.configurable).to.be.false;
+                expect(Example.enumwrite()).to.eql('__3__');
+
+                expect(descs.enum.enumerable).to.be.true;
+                expect(descs.enum.writable).to.be.false;
+                expect(descs.enum.configurable).to.be.false;
+                expect(Example.enum()).to.eql('__4__');
+
+                expect(descs.confwrite.enumerable).to.be.false;
+                expect(descs.confwrite.writable).to.be.true;
+                expect(descs.confwrite.configurable).to.be.true;
+                expect(Example.confwrite()).to.eql('__5__');
+
+                expect(descs.conf.enumerable).to.be.false;
+                expect(descs.conf.writable).to.be.false;
+                expect(descs.conf.configurable).to.be.true;
+                expect(Example.conf()).to.eql('__6__');
+
+                expect(descs.write.enumerable).to.be.false;
+                expect(descs.write.writable).to.be.true;
+                expect(descs.write.configurable).to.be.false;
+                expect(Example.write()).to.eql('__7__');
+
+                expect(descs._.enumerable).to.be.false;
+                expect(descs._.writable).to.be.false;
+                expect(descs._.configurable).to.be.false;
+                expect(Example._()).to.eql('__8__');
             });
         });
 

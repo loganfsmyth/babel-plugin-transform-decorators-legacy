@@ -89,13 +89,9 @@ export default function({types: t}){
 
         const name = classPath.scope.generateDeclaredUidIdentifier('class');
 
-        const target = buildClassPrototype({
-            CLASS_REF: name,
-        }).expression;
-
         return t.sequenceExpression([
             t.assignmentExpression('=', name, classPath.node),
-            applyTargetDecorators(classPath, name, target, classPath.node.body.body),
+            applyTargetDecorators(classPath, name, classPath.node.body.body),
             name,
         ]);
     }
@@ -115,7 +111,7 @@ export default function({types: t}){
 
         return t.sequenceExpression([
             t.assignmentExpression('=', name, path.node),
-            applyTargetDecorators(path, name, name, path.node.properties),
+            applyTargetDecorators(path, name, path.node.properties),
             name,
         ]);
     }
@@ -123,7 +119,7 @@ export default function({types: t}){
     /**
      * A helper to pull out property decorators into a sequence expression.
      */
-    function applyTargetDecorators(path, name, target, decoratedProps){
+    function applyTargetDecorators(path, name, decoratedProps){
         const descName = path.scope.generateDeclaredUidIdentifier('desc');
         const valueTemp = path.scope.generateDeclaredUidIdentifier('value');
 
@@ -133,7 +129,19 @@ export default function({types: t}){
 
             if (decorators.length === 0) return acc;
 
+            if (t.isClassProperty(node, {static: true})){
+                throw path.buildCodeFrameError('Static class property decorators are not yet supported.')
+            }
+
+            if (node.computed){
+                throw path.buildCodeFrameError('Computed method/property decorators are not yet supported.')
+            }
+
             const property = t.stringLiteral(node.key.name);
+
+            const target = (path.isClass() && !node.static) ? buildClassPrototype({
+                CLASS_REF: name,
+            }).expression : name;
 
             let buildDecoratorCall = function(descriptor, expr){
                 return buildPropertyDecorator({
