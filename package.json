@@ -1,12 +1,23 @@
 {
   "name": "babel-plugin-transform-decorators-legacy",
+  "description": "A plugin for Babel 6 that (mostly) replicates the old decorator behavior from Babel 5.",
   "version": "1.0.0",
+  "author": "Logan Smyth <loganfsmyth@gmail.com>",
   "main": "lib",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/loganfsmyth/babel-plugin-transform-decorators-legacy.git"
   },
+  "bugs": {
+    "url": "https://github.com/loganfsmyth/babel-plugin-transform-decorators-legacy/issues"
+  },
+  "keywords": [
+    "babel",
+    "babel-plugin",
+    "es7",
+    "decorators"
+  ],
   "devDependencies": {
     "babel-cli": "^6.2.0",
     "babel-plugin-transform-class-properties": "^6.3.0",
