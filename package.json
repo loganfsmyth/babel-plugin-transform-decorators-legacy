@@ -1,5 +1,6 @@
 {
   "name": "babel-plugin-transform-decorators-legacy",
+  "version": "1.0.0",
   "main": "lib",
   "license": "MIT",
   "repository": {
@@ -12,7 +13,9 @@
     "babel-preset-es2015": "^6.1.18"
   },
   "dependencies": {
-    "babel-runtime": "^6.2.0"
+    "babel-plugin-syntax-decorators": "^6.1.18",
+    "babel-runtime": "^6.2.0",
+    "babel-template": "^6.3.0"
   },
   "scripts": {
     "build": "babel src -d lib",
