@@ -13,6 +13,11 @@ Beware, this plugin is a best effort to maintain feature parity with Babel 5, bu
 are slight differences if you were relied on side-effects between decorators in some
 cases.
 
+## Limitations
+
+Currently this implementation discards changes to `enumerable`, `configurable` and `writable`
+when decorating class properties.
+
 ## License
 
 MIT (c) 2015
