@@ -659,6 +659,29 @@ describe('decorators', function(){
                 expect(inst._).to.eql('__8__');
             });
         });
+
+        describe('static properties', function(){
+            it('should assign static properties to the undecorated class', function(){
+                function dec(cls){
+                    return class extends cls {
+                        static undecoratedClass = cls;
+                    };
+                }
+
+                @dec
+                class Example {
+                    static property = 1;
+                    static method() {}
+                }
+
+                expect(Example.undecoratedClass).to.exist;
+                expect(Example.undecoratedClass.property).to.eql(1);
+                expect(Example.undecoratedClass.method).to.exist;
+
+                expect(Example.property).to.eql(1);
+                expect(Example.method).to.exist;
+            });
+        });
     });
 
     describe('object', function(){
