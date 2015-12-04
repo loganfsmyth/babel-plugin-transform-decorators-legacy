@@ -600,7 +600,7 @@ describe('decorators', function(){
             });
         });
 
-        describe('properties', function(){
+        describe('prototype properties', function(){
             it('should support decorating properties that have no initializer', function(){
                 function dec(target, name, descriptor){
 

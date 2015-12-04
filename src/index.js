@@ -102,20 +102,14 @@ export default function({types: t}){
      * Given a class expression with method-level decorators, create a new expression
      * with the proper decorated behavior.
      */
-    function applyMethodDecorators(classPath){
-        const hasMethodDecorators = classPath.node.body.body.some(function(node){
+    function applyMethodDecorators(path){
+        const hasMethodDecorators = path.node.body.body.some(function(node){
             return (node.decorators || []).length > 0;
         });
 
         if (!hasMethodDecorators) return;
 
-        const name = classPath.scope.generateDeclaredUidIdentifier('class');
-
-        return t.sequenceExpression([
-            t.assignmentExpression('=', name, classPath.node),
-            applyTargetDecorators(classPath, name, classPath.node.body.body),
-            name,
-        ]);
+        return applyTargetDecorators(path, path.node.body.body);
     }
 
     /**
@@ -129,23 +123,19 @@ export default function({types: t}){
 
         if (!hasMethodDecorators) return;
 
-        const name = path.scope.generateDeclaredUidIdentifier('obj');
-
-        return t.sequenceExpression([
-            t.assignmentExpression('=', name, path.node),
-            applyTargetDecorators(path, name, path.node.properties),
-            name,
-        ]);
+        return applyTargetDecorators(path, path.node.properties);
     }
 
     /**
      * A helper to pull out property decorators into a sequence expression.
      */
-    function applyTargetDecorators(path, name, decoratedProps){
+    function applyTargetDecorators(path, decoratedProps){
         const descName = path.scope.generateDeclaredUidIdentifier('desc');
         const valueTemp = path.scope.generateDeclaredUidIdentifier('value');
 
-        return t.sequenceExpression(decoratedProps.reduce(function(acc, node){
+        const name = path.scope.generateDeclaredUidIdentifier(path.isClass() ? 'class' : 'obj');
+
+        const exprs = decoratedProps.reduce(function(acc, node){
             const decorators = node.decorators || [];
             node.decorators = null;
 
@@ -249,9 +239,14 @@ export default function({types: t}){
                     .reduce(buildDecoratorCall, t.assignmentExpression('=', descName, buildDescriptorCreate())),
                 buildDescriptorStore()
             );
-        }, []))
-    }
+        }, []);
 
+        return t.sequenceExpression([
+            t.assignmentExpression('=', name, path.node),
+            t.sequenceExpression(exprs),
+            name,
+        ]);
+    }
 
     return {
         inherits: require("babel-plugin-syntax-decorators"),
