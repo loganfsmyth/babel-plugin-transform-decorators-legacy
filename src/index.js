@@ -53,6 +53,25 @@ const buildSetClassInitializer = template(`
 export default function({types: t}){
 
     /**
+     * If the decorator expressions are non-identifiers, hoist them to before the class so we can be sure
+     * that they are evaluated in order.
+     */
+    function applyEnsureOrdering(path){
+        // TODO: This should probably also hoist computed properties.
+        const decorators = (path.isClass() ? [path].concat(path.get('body.body')) : path.get('properties'))
+                .reduce((acc, prop) => acc.concat(prop.node.decorators || []), []);
+
+        const identDecorators = decorators.filter(decorator => !t.isIdentifier(decorator.expression));
+        if (identDecorators.length === 0) return;
+
+        return t.sequenceExpression(identDecorators.map(decorator => {
+            const expression = decorator.expression;
+            const id = decorator.expression = path.scope.generateDeclaredUidIdentifier('dec');
+            return t.assignmentExpression('=', id, expression);
+        }).concat([path.node]));
+    }
+
+    /**
      * Given a class expression with class-level decorators, create a new expression
      * with the proper decorated behavior.
      */
@@ -256,12 +275,12 @@ export default function({types: t}){
             ClassExpression(path){
                 // Create a replacement for the class node if there is one. We do one pass to replace classes with
                 // class decorators, and a second pass to process method decorators.
-                const decoratedClass = applyClassDecorators(path) || applyMethodDecorators(path);
+                const decoratedClass = applyEnsureOrdering(path) || applyClassDecorators(path) || applyMethodDecorators(path);
 
                 if (decoratedClass) path.replaceWith(decoratedClass);
             },
             ObjectExpression(path){
-                const decoratedObject = applyObjectDecorators(path);
+                const decoratedObject = applyEnsureOrdering(path) || applyObjectDecorators(path);
 
                 if (decoratedObject) path.replaceWith(decoratedObject);
             },
