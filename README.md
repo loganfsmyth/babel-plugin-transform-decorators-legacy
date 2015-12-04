@@ -15,8 +15,9 @@ cases.
 
 ## Limitations
 
-Currently this implementation discards changes to `enumerable`, `configurable` and `writable`
+* Currently this implementation discards changes to `enumerable`, `configurable` and `writable`
 when decorating class properties.
+* Currently decorating static class properties is unsupported. Support will be added shortly.
 
 ## License
 
