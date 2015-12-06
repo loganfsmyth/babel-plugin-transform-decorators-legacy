@@ -156,7 +156,7 @@ export default function({types: t}){
                 throw path.buildCodeFrameError('Computed method/property decorators are not yet supported.')
             }
 
-            const property = t.stringLiteral(node.key.name);
+            const property = t.stringLiteral(node.key.name || node.key.value);
 
             const target = (path.isClass() && !node.static) ? buildClassPrototype({
                 CLASS_REF: name,
