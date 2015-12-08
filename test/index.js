@@ -125,6 +125,8 @@ describe('decorators', function(){
 
             it('should allow returning a descriptor', function(){
                 function dec(target, name, descriptor){
+                    target.decoratedProps = (target.decoratedProps || []).concat([name]);
+
                     let value = descriptor.value;
                     return {
                         enumerable: name.indexOf('enum') !== -1,
@@ -177,6 +179,19 @@ describe('decorators', function(){
                         return 8;
                     }
                 }
+
+                expect(Example.prototype).to.have.ownProperty('decoratedProps');
+                expect(Example.prototype.decoratedProps).to.eql([
+                    "enumconfwrite",
+                    "enumconf",
+                    "enumwrite",
+                    "enum",
+                    "confwrite",
+                    "conf",
+                    "write",
+                    "_",
+                ]);
+
                 const inst = new Example();
 
                 const descs = Object.getOwnPropertyDescriptors(Example.prototype);
@@ -223,6 +238,8 @@ describe('decorators', function(){
 
             it('should allow mutating the original descriptor', function(){
                 function dec(target, name, descriptor){
+                    target.decoratedProps = (target.decoratedProps || []).concat([name]);
+
                     let value = descriptor.value;
                     Object.assign(descriptor, {
                         enumerable: name.indexOf('enum') !== -1,
@@ -275,6 +292,19 @@ describe('decorators', function(){
                         return 8;
                     }
                 }
+
+                expect(Example.prototype).to.have.ownProperty('decoratedProps');
+                expect(Example.prototype.decoratedProps).to.eql([
+                    "enumconfwrite",
+                    "enumconf",
+                    "enumwrite",
+                    "enum",
+                    "confwrite",
+                    "conf",
+                    "write",
+                    "_",
+                ]);
+
                 const inst = new Example();
 
                 const descs = Object.getOwnPropertyDescriptors(Example.prototype);
@@ -349,6 +379,8 @@ describe('decorators', function(){
 
             it('should allow returning a descriptor', function(){
                 function dec(target, name, descriptor){
+                    target.decoratedProps = (target.decoratedProps || []).concat([name]);
+
                     let value = descriptor.value;
                     return {
                         enumerable: name.indexOf('enum') !== -1,
@@ -402,6 +434,18 @@ describe('decorators', function(){
                     }
                 }
 
+                expect(Example).to.have.ownProperty('decoratedProps');
+                expect(Example.decoratedProps).to.eql([
+                    "enumconfwrite",
+                    "enumconf",
+                    "enumwrite",
+                    "enum",
+                    "confwrite",
+                    "conf",
+                    "write",
+                    "_",
+                ]);
+
                 const descs = Object.getOwnPropertyDescriptors(Example);
                 expect(descs.enumconfwrite.enumerable).to.be.true;
                 expect(descs.enumconfwrite.writable).to.be.true;
@@ -446,6 +490,8 @@ describe('decorators', function(){
 
             it('should allow mutating the original descriptor', function(){
                 function dec(target, name, descriptor){
+                    target.decoratedProps = (target.decoratedProps || []).concat([name]);
+
                     let value = descriptor.value;
                     Object.assign(descriptor, {
                         enumerable: name.indexOf('enum') !== -1,
@@ -498,6 +544,18 @@ describe('decorators', function(){
                         return 8;
                     }
                 }
+
+                expect(Example).to.have.ownProperty('decoratedProps');
+                expect(Example.decoratedProps).to.eql([
+                    "enumconfwrite",
+                    "enumconf",
+                    "enumwrite",
+                    "enum",
+                    "confwrite",
+                    "conf",
+                    "write",
+                    "_",
+                ]);
 
                 const descs = Object.getOwnPropertyDescriptors(Example);
                 expect(descs.enumconfwrite.enumerable).to.be.true;
@@ -559,6 +617,8 @@ describe('decorators', function(){
 
             it('should allow returning a descriptor', function(){
                 function dec(target, name, descriptor){
+                    target.decoratedProps = (target.decoratedProps || []).concat([name]);
+
                     let initializer = descriptor.initializer;
                     return {
                         enumerable: name.indexOf('enum') !== -1,
@@ -596,6 +656,18 @@ describe('decorators', function(){
                     _ = 8;
                 }
                 const inst = new Example();
+
+                expect(Example.prototype).to.have.ownProperty('decoratedProps');
+                expect(inst.decoratedProps).to.eql([
+                    "enumconfwrite",
+                    "enumconf",
+                    "enumwrite",
+                    "enum",
+                    "confwrite",
+                    "conf",
+                    "write",
+                    "_",
+                ]);
 
                 const descs = Object.getOwnPropertyDescriptors(inst);
                 expect(descs.enumconfwrite.enumerable).to.be.true;
@@ -643,6 +715,8 @@ describe('decorators', function(){
 
             it('should allow mutating the original descriptor', function(){
                 function dec(target, name, descriptor){
+                    target.decoratedProps = (target.decoratedProps || []).concat([name]);
+
                     let initializer = descriptor.initializer;
                     Object.assign(descriptor, {
                         enumerable: name.indexOf('enum') !== -1,
@@ -680,6 +754,18 @@ describe('decorators', function(){
                     _ = 8;
                 }
                 const inst = new Example();
+
+                expect(Example.prototype).to.have.ownProperty('decoratedProps');
+                expect(inst.decoratedProps).to.eql([
+                    "enumconfwrite",
+                    "enumconf",
+                    "enumwrite",
+                    "enum",
+                    "confwrite",
+                    "conf",
+                    "write",
+                    "_",
+                ]);
 
                 const descs = Object.getOwnPropertyDescriptors(inst);
                 expect(descs.enumconfwrite.enumerable).to.be.true;
@@ -816,6 +902,8 @@ describe('decorators', function(){
 
             it('should allow returning a descriptor', function(){
                 function dec(target, name, descriptor){
+                    target.decoratedProps = (target.decoratedProps || []).concat([name]);
+
                     let value = descriptor.value;
                     return {
                         enumerable: name.indexOf('enum') !== -1,
@@ -869,6 +957,18 @@ describe('decorators', function(){
                     },
                 }
 
+                expect(inst).to.have.ownProperty('decoratedProps');
+                expect(inst.decoratedProps).to.eql([
+                    "enumconfwrite",
+                    "enumconf",
+                    "enumwrite",
+                    "enum",
+                    "confwrite",
+                    "conf",
+                    "write",
+                    "_",
+                ]);
+
                 const descs = Object.getOwnPropertyDescriptors(inst);
                 expect(descs.enumconfwrite.enumerable).to.be.true;
                 expect(descs.enumconfwrite.writable).to.be.true;
@@ -913,6 +1013,8 @@ describe('decorators', function(){
 
             it('should allow mutating the original descriptor', function(){
                 function dec(target, name, descriptor){
+                    target.decoratedProps = (target.decoratedProps || []).concat([name]);
+
                     let value = descriptor.value;
                     Object.assign(descriptor, {
                         enumerable: name.indexOf('enum') !== -1,
@@ -965,6 +1067,18 @@ describe('decorators', function(){
                         return 8;
                     },
                 }
+
+                expect(inst).to.have.ownProperty('decoratedProps');
+                expect(inst.decoratedProps).to.eql([
+                    "enumconfwrite",
+                    "enumconf",
+                    "enumwrite",
+                    "enum",
+                    "confwrite",
+                    "conf",
+                    "write",
+                    "_",
+                ]);
 
                 const descs = Object.getOwnPropertyDescriptors(inst);
                 expect(descs.enumconfwrite.enumerable).to.be.true;
@@ -1034,6 +1148,8 @@ describe('decorators', function(){
 
             it('should allow returning a descriptor', function(){
                 function dec(target, name, descriptor){
+                    target.decoratedProps = (target.decoratedProps || []).concat([name]);
+
                     let initializer = descriptor.initializer;
                     return {
                         enumerable: name.indexOf('enum') !== -1,
@@ -1070,6 +1186,18 @@ describe('decorators', function(){
                     @dec
                     _: 8,
                 };
+
+                expect(inst).to.have.ownProperty('decoratedProps');
+                expect(inst.decoratedProps).to.eql([
+                    "enumconfwrite",
+                    "enumconf",
+                    "enumwrite",
+                    "enum",
+                    "confwrite",
+                    "conf",
+                    "write",
+                    "_",
+                ]);
 
                 const descs = Object.getOwnPropertyDescriptors(inst);
                 expect(descs.enumconfwrite.enumerable).to.be.true;
@@ -1115,6 +1243,8 @@ describe('decorators', function(){
 
             it('should allow mutating the original descriptor', function(){
                 function dec(target, name, descriptor){
+                    target.decoratedProps = (target.decoratedProps || []).concat([name]);
+
                     let initializer = descriptor.initializer;
                     Object.assign(descriptor, {
                         enumerable: name.indexOf('enum') !== -1,
@@ -1151,6 +1281,18 @@ describe('decorators', function(){
                     @dec
                     _: 8,
                 };
+
+                expect(inst).to.have.ownProperty('decoratedProps');
+                expect(inst.decoratedProps).to.eql([
+                    "enumconfwrite",
+                    "enumconf",
+                    "enumwrite",
+                    "enum",
+                    "confwrite",
+                    "conf",
+                    "write",
+                    "_",
+                ]);
 
                 const descs = Object.getOwnPropertyDescriptors(inst);
                 expect(descs.enumconfwrite.enumerable).to.be.true;
