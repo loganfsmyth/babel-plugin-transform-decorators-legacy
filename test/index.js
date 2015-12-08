@@ -543,6 +543,20 @@ describe('decorators', function(){
         });
 
         describe('properties', function(){
+            it('should support decorating properties that have no initializer', function(){
+                function dec(target, name, descriptor){
+
+                }
+
+                class Example {
+                    @dec prop;
+                }
+
+                let inst = new Example();
+                expect(inst).to.have.ownProperty('prop');
+                expect(inst.prop).to.be.undefined;
+            });
+
             it('should allow returning a descriptor', function(){
                 function dec(target, name, descriptor){
                     let initializer = descriptor.initializer;

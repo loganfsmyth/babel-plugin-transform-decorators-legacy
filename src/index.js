@@ -17,7 +17,7 @@ const buildGetDescriptor = template(`
 `);
 
 const buildSetDescriptor = template(`
-    DESC ? Object.defineProperty(TARGET, PROPERTY, DESC) : undefined;
+    DESC ? Object.defineProperty(TARGET, PROPERTY, DESC) : void 0;
 `);
 
 const buildGetObjectInitializer = template(`
@@ -32,7 +32,7 @@ const buildGetObjectInitializer = template(`
 `);
 
 const buildSetObjectInitializer = template(`
-    (DESC.value = DESC.initializer ? DESC.initializer.call(TARGET) : undefined) &&
+    (DESC.value = DESC.initializer ? DESC.initializer.call(TARGET) : void 0) &&
         Object.defineProperty(TARGET, PROPERTY, DESC);
 `);
 
@@ -49,6 +49,9 @@ const buildSetClassInitializer = template(`
     INIT = DESC.initializer;
 `);
 
+const buildClassInitializerCall = template(`
+    INIT ? INIT.apply(this) : void 0;
+`);
 
 export default function({types: t}){
 
@@ -202,7 +205,9 @@ export default function({types: t}){
                         t.returnStatement(oldInitializer),
                     ]))));
                 }
-                node.value = t.callExpression(t.memberExpression(init, t.identifier('apply')), [t.thisExpression()]);
+                node.value = buildClassInitializerCall({
+                    INIT: init,
+                }).expression;
 
                 // Create initializer that reads from new temp.
                 buildDescriptorCreate = function(){
