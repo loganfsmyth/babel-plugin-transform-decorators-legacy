@@ -97,6 +97,32 @@ describe('decorators', function(){
         });
 
         describe('prototype methods', function(){
+            it('should support numeric props', function(){
+                function dec(target, name, descriptor){
+                    expect(name).to.eql(4);
+                }
+
+                class Example {
+                    @dec
+                    4(){
+
+                    }
+                }
+            });
+
+            it('should support string props', function(){
+                function dec(target, name, descriptor){
+                    expect(name).to.eql("str");
+                }
+
+                class Example {
+                    @dec
+                    "str"(){
+
+                    }
+                }
+            });
+
             it('should allow returning a descriptor', function(){
                 function dec(target, name, descriptor){
                     let value = descriptor.value;
@@ -295,6 +321,32 @@ describe('decorators', function(){
         });
 
         describe('static methods', function(){
+            it('should support numeric props', function(){
+                function dec(target, name, descriptor){
+                    expect(name).to.eql(4);
+                }
+
+                class Example {
+                    @dec
+                    static 4(){
+
+                    }
+                }
+            });
+
+            it('should support string props', function(){
+                function dec(target, name, descriptor){
+                    expect(name).to.eql("str");
+                }
+
+                class Example {
+                    @dec
+                    static "str"(){
+
+                    }
+                }
+            });
+
             it('should allow returning a descriptor', function(){
                 function dec(target, name, descriptor){
                     let value = descriptor.value;
@@ -722,6 +774,32 @@ describe('decorators', function(){
         });
 
         describe('methods', function(){
+            it('should support numeric props', function(){
+                function dec(target, name, descriptor){
+                    expect(name).to.eql(4);
+                }
+
+                const inst = {
+                    @dec
+                    4(){
+
+                    }
+                };
+            });
+
+            it('should support string props', function(){
+                function dec(target, name, descriptor){
+                    expect(name).to.eql("str");
+                }
+
+                const inst = {
+                    @dec
+                    "str"(){
+
+                    }
+                };
+            });
+
             it('should allow returning a descriptor', function(){
                 function dec(target, name, descriptor){
                     let value = descriptor.value;
@@ -918,6 +996,28 @@ describe('decorators', function(){
         });
 
         describe('properties', function(){
+            it('should support numeric props', function(){
+                function dec(target, name, descriptor){
+                    expect(name).to.eql(4);
+                }
+
+                const inst = {
+                    @dec
+                    4: 1
+                };
+            });
+
+            it('should support string props', function(){
+                function dec(target, name, descriptor){
+                    expect(name).to.eql("str");
+                }
+
+                const inst = {
+                    @dec
+                    "str": 1
+                };
+            });
+
             it('should allow returning a descriptor', function(){
                 function dec(target, name, descriptor){
                     let initializer = descriptor.initializer;
