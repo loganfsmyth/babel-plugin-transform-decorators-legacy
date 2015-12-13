@@ -14,7 +14,7 @@ const buildGetDescriptor = template(`
 
 
 const buildGetObjectInitializer = template(`
-    (TEMP = Object.getOwnPropertyDescriptor(TARGET, PROPERTY).value, {
+    (TEMP = Object.getOwnPropertyDescriptor(TARGET, PROPERTY), (TEMP = TEMP ? TEMP.value : undefined), {
         enumerable: true,
         configurable: true,
         writable: true,
@@ -210,10 +210,6 @@ export default function({types: t}){
 
             if (decorators.length === 0) return acc;
 
-            if (t.isClassProperty(node, {static: true})){
-                throw path.buildCodeFrameError('Static class property decorators are not yet supported.')
-            }
-
             if (node.computed){
                 throw path.buildCodeFrameError('Computed method/property decorators are not yet supported.')
             }
@@ -224,7 +220,7 @@ export default function({types: t}){
                 CLASS_REF: name,
             }).expression : name;
 
-            if (t.isClassProperty(node)){
+            if (t.isClassProperty(node, {static: false})){
                 let descriptor = path.scope.generateDeclaredUidIdentifier('descriptor');
 
                 const initializer = node.value ?
@@ -249,7 +245,7 @@ export default function({types: t}){
                         target,
                         property,
                         t.arrayExpression(decorators.map(dec => dec.expression)),
-                        t.isObjectProperty(node) ? buildGetObjectInitializer({
+                        (t.isObjectProperty(node) || t.isClassProperty(node, {static: true})) ? buildGetObjectInitializer({
                             TEMP: path.scope.generateDeclaredUidIdentifier('init'),
                             TARGET: target,
                             PROPERTY: property,
