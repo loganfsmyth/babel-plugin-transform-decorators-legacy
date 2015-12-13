@@ -675,41 +675,39 @@ describe('decorators', function(){
                 expect(descs.enumconfwrite.configurable).to.be.true;
                 expect(inst.enumconfwrite).to.eql('__1__');
 
-                // All the the descriptor props from here on aren't right, but it's way
-                // harder to support descriptor mutation for class props.
                 expect(descs.enumconf.enumerable).to.be.true;
-                expect(descs.enumconf.writable).to.be.true;
+                expect(descs.enumconf.writable).to.be.false;
                 expect(descs.enumconf.configurable).to.be.true;
                 expect(inst.enumconf).to.eql('__2__');
 
                 expect(descs.enumwrite.enumerable).to.be.true;
                 expect(descs.enumwrite.writable).to.be.true;
-                expect(descs.enumwrite.configurable).to.be.true;
+                expect(descs.enumwrite.configurable).to.be.false;
                 expect(inst.enumwrite).to.eql('__3__');
 
                 expect(descs.enum.enumerable).to.be.true;
-                expect(descs.enum.writable).to.be.true;
-                expect(descs.enum.configurable).to.be.true;
+                expect(descs.enum.writable).to.be.false;
+                expect(descs.enum.configurable).to.be.false;
                 expect(inst.enum).to.eql('__4__');
 
-                expect(descs.confwrite.enumerable).to.be.true;
+                expect(descs.confwrite.enumerable).to.be.false;
                 expect(descs.confwrite.writable).to.be.true;
                 expect(descs.confwrite.configurable).to.be.true;
                 expect(inst.confwrite).to.eql('__5__');
 
-                expect(descs.conf.enumerable).to.be.true;
-                expect(descs.conf.writable).to.be.true;
+                expect(descs.conf.enumerable).to.be.false;
+                expect(descs.conf.writable).to.be.false;
                 expect(descs.conf.configurable).to.be.true;
                 expect(inst.conf).to.eql('__6__');
 
-                expect(descs.write.enumerable).to.be.true;
+                expect(descs.write.enumerable).to.be.false;
                 expect(descs.write.writable).to.be.true;
-                expect(descs.write.configurable).to.be.true;
+                expect(descs.write.configurable).to.be.false;
                 expect(inst.write).to.eql('__7__');
 
-                expect(descs._.enumerable).to.be.true;
-                expect(descs._.writable).to.be.true;
-                expect(descs._.configurable).to.be.true;
+                expect(descs._.enumerable).to.be.false;
+                expect(descs._.writable).to.be.false;
+                expect(descs._.configurable).to.be.false;
                 expect(inst._).to.eql('__8__');
             });
 
@@ -773,41 +771,39 @@ describe('decorators', function(){
                 expect(descs.enumconfwrite.configurable).to.be.true;
                 expect(inst.enumconfwrite).to.eql('__1__');
 
-                // All the the descriptor props from here on aren't right, but it's way
-                // harder to support descriptor mutation for class props.
                 expect(descs.enumconf.enumerable).to.be.true;
-                expect(descs.enumconf.writable).to.be.true;
+                expect(descs.enumconf.writable).to.be.false;
                 expect(descs.enumconf.configurable).to.be.true;
                 expect(inst.enumconf).to.eql('__2__');
 
                 expect(descs.enumwrite.enumerable).to.be.true;
                 expect(descs.enumwrite.writable).to.be.true;
-                expect(descs.enumwrite.configurable).to.be.true;
+                expect(descs.enumwrite.configurable).to.be.false;
                 expect(inst.enumwrite).to.eql('__3__');
 
                 expect(descs.enum.enumerable).to.be.true;
-                expect(descs.enum.writable).to.be.true;
-                expect(descs.enum.configurable).to.be.true;
+                expect(descs.enum.writable).to.be.false;
+                expect(descs.enum.configurable).to.be.false;
                 expect(inst.enum).to.eql('__4__');
 
-                expect(descs.confwrite.enumerable).to.be.true;
+                expect(descs.confwrite.enumerable).to.be.false;
                 expect(descs.confwrite.writable).to.be.true;
                 expect(descs.confwrite.configurable).to.be.true;
                 expect(inst.confwrite).to.eql('__5__');
 
-                expect(descs.conf.enumerable).to.be.true;
-                expect(descs.conf.writable).to.be.true;
+                expect(descs.conf.enumerable).to.be.false;
+                expect(descs.conf.writable).to.be.false;
                 expect(descs.conf.configurable).to.be.true;
                 expect(inst.conf).to.eql('__6__');
 
-                expect(descs.write.enumerable).to.be.true;
+                expect(descs.write.enumerable).to.be.false;
                 expect(descs.write.writable).to.be.true;
-                expect(descs.write.configurable).to.be.true;
+                expect(descs.write.configurable).to.be.false;
                 expect(inst.write).to.eql('__7__');
 
-                expect(descs._.enumerable).to.be.true;
-                expect(descs._.writable).to.be.true;
-                expect(descs._.configurable).to.be.true;
+                expect(descs._.enumerable).to.be.false;
+                expect(descs._.writable).to.be.false;
+                expect(descs._.configurable).to.be.false;
                 expect(inst._).to.eql('__8__');
             });
         });

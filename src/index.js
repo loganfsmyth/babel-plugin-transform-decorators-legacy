@@ -4,10 +4,6 @@ const buildClassDecorator = template(`
   DECORATOR(CLASS_REF = INNER) || CLASS_REF;
 `);
 
-const buildPropertyDecorator = template(`
-  DESC = DECORATOR(TARGET, PROPERTY, INNER) || DESC;
-`);
-
 const buildClassPrototype = template(`
   CLASS_REF.prototype;
 `);
@@ -16,9 +12,6 @@ const buildGetDescriptor = template(`
     Object.getOwnPropertyDescriptor(TARGET, PROPERTY);
 `);
 
-const buildSetDescriptor = template(`
-    DESC ? Object.defineProperty(TARGET, PROPERTY, DESC) : void 0;
-`);
 
 const buildGetObjectInitializer = template(`
     (TEMP = Object.getOwnPropertyDescriptor(TARGET, PROPERTY).value, {
@@ -31,29 +24,105 @@ const buildGetObjectInitializer = template(`
     })
 `);
 
-const buildSetObjectInitializer = template(`
-    (DESC.value = DESC.initializer ? DESC.initializer.call(TARGET) : void 0) &&
-        Object.defineProperty(TARGET, PROPERTY, DESC);
+const buildInitializerWarningHelper = template(`
+    function NAME(descriptor, context){
+        throw new Error('Decorating class property failed. Please ensure that transform-class-properties is enabled.');
+    }
 `);
 
-const buildGetClassInitializer = template(`
-    ({
-        enumerable: true,
-        configurable: true,
-        writable: true,
-        initializer: INIT,
-    })
+const buildInitializerDefineProperty = template(`
+    function NAME(target, property, descriptor, context){
+        if (!descriptor) return;
+
+        Object.defineProperty(target, property, {
+            enumerable: descriptor.enumerable,
+            configurable: descriptor.configurable,
+            writable: descriptor.writable,
+            value: descriptor.initializer ? descriptor.initializer.call(context) : void 0,
+        });
+    }
 `);
 
-const buildSetClassInitializer = template(`
-    INIT = DESC.initializer;
-`);
+const buildApplyDecoratedDescriptor = template(`
+    function NAME(target, property, decorators, descriptor, context){
+        let desc = {
+            enumerable: !!descriptor.enumerable,
+            configurable: !!descriptor.configurable,
+        };
+        if ('value' in descriptor || 'initializer' in descriptor){
+            desc.writable = true;
+            desc.initializer = descriptor.initializer;
+            desc.value = descriptor.value;
+        } else {
+            desc.get = descriptor.get;
+            desc.set = descriptor.set;
+        }
 
-const buildClassInitializerCall = template(`
-    INIT ? INIT.apply(this) : void 0;
+        desc = decorators.slice().reverse().reduce(function(desc, decorator){
+            return decorator(target, property, desc) || desc;
+        }, desc);
+
+        if (context && desc.initializer !== void 0){
+            desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
+            desc.initializer = undefined;
+        }
+
+        if (desc.initializer === void 0){
+            Object.defineProperty(target, property, desc);
+            desc = null;
+        }
+
+        return desc;
+    }
 `);
 
 export default function({types: t}){
+    /**
+     * Add a helper to take an initial descriptor, apply some decorators to it, and optionally
+     * define the property.
+     */
+    function ensureApplyDecoratedDescriptorHelper(path, state){
+        if (!state.applyDecoratedDescriptor){
+            state.applyDecoratedDescriptor = path.scope.generateUidIdentifier('applyDecoratedDescriptor');
+            const helper = buildApplyDecoratedDescriptor({
+                NAME: state.applyDecoratedDescriptor,
+            });
+            path.scope.getProgramParent().path.unshiftContainer('body', helper);
+        }
+
+        return state.applyDecoratedDescriptor;
+    }
+
+    /**
+     * Add a helper to call as a replacement for class property definition.
+     */
+    function ensureInitializerDefineProp(path, state){
+        if (!state.initializerDefineProp){
+            state.initializerDefineProp = path.scope.generateUidIdentifier('initDefineProp');
+            const helper = buildInitializerDefineProperty({
+                NAME: state.initializerDefineProp,
+            })
+            path.scope.getProgramParent().path.unshiftContainer('body', helper);
+        }
+
+        return state.initializerDefineProp;
+    }
+
+    /**
+     * Add a helper that will throw a useful error if the transform fails to detect the class
+     * property assignment, so users know something failed.
+     */
+    function ensureInitializerWarning(path, state){
+        if (!state.initializerWarningHelper){
+            state.initializerWarningHelper = path.scope.generateUidIdentifier('initializerWarningHelper');
+            const helper = buildInitializerWarningHelper({
+                NAME: state.initializerWarningHelper,
+            })
+            path.scope.getProgramParent().path.unshiftContainer('body', helper);
+        }
+
+        return state.initializerWarningHelper;
+    }
 
     /**
      * If the decorator expressions are non-identifiers, hoist them to before the class so we can be sure
@@ -155,90 +224,45 @@ export default function({types: t}){
                 CLASS_REF: name,
             }).expression : name;
 
-            let buildDecoratorCall = function(descriptor, expr){
-                return buildPropertyDecorator({
-                    TARGET: target,
-                    DECORATOR: expr,
-                    DESC: descName,
-                    INNER: descriptor,
-                    PROPERTY: property,
-                }).expression;
-            };
-            let buildDescriptorCreate;
-            let buildDescriptorStore;
+            if (t.isClassProperty(node)){
+                let descriptor = path.scope.generateDeclaredUidIdentifier('descriptor');
 
-            if (t.isObjectProperty(node)){
-                // Read value from object and store in temp to be read from initializer.
-                buildDescriptorCreate = function(){
-                    return buildGetObjectInitializer({
-                        TEMP: path.scope.generateDeclaredUidIdentifier('init'),
-                        TARGET: target,
-                        PROPERTY: property
-                    }).expression;
-                };
+                const initializer = node.value ?
+                        t.functionExpression(null, [], t.blockStatement([t.returnStatement(node.value)])) :
+                        t.nullLiteral();
+                node.value = t.callExpression(ensureInitializerWarning(path, state), [descriptor, t.thisExpression()]);
 
-                // Trigger initializer and set descriptor.
-                buildDescriptorStore = function(){
-                    return buildSetObjectInitializer({
-                        TARGET: target,
-                        PROPERTY: property,
-                        DESC: descName,
-                    }).expression;
-                };
-            } else if (t.isClassProperty(node)){
-                let init = path.scope.generateDeclaredUidIdentifier('init');
-                let oldInitializer;
-                if (node.value){
-                    // Move the initializer to a temp variable and reassign to new temp.
-                    oldInitializer = node.value;
-                    acc.push(t.assignmentExpression('=', init, t.functionExpression(null, [], t.blockStatement([
-                        t.returnStatement(oldInitializer),
-                    ]))));
-                }
-                node.value = buildClassInitializerCall({
-                    INIT: init,
-                }).expression;
-
-                // Create initializer that reads from new temp.
-                buildDescriptorCreate = function(){
-                    return buildGetClassInitializer({
-                        INIT: oldInitializer ? init : t.nullLiteral(),
-                    }).expression;
-                };
-
-                // Trigger initializer and set descriptor.
-                buildDescriptorStore = function(){
-                    return buildSetClassInitializer({
-                        INIT: init,
-                        DESC: descName,
-                    }).expression;
-                };
+                acc = acc.concat([
+                    t.assignmentExpression('=', descriptor, t.callExpression(ensureApplyDecoratedDescriptorHelper(path, state), [
+                        target,
+                        property,
+                        t.arrayExpression(decorators.map(dec => dec.expression)),
+                        t.objectExpression([
+                            t.objectProperty(t.identifier('enumerable'), t.booleanLiteral(true)),
+                            t.objectProperty(t.identifier('initializer'), initializer),
+                        ]),
+                    ])),
+                ]);
             } else {
-                // Read descriptor normally.
-                buildDescriptorCreate = function(){
-                    return buildGetDescriptor({
-                        TARGET: target,
-                        PROPERTY: property,
-                    }).expression;
-                };
-
-                // Store descriptor normally.
-                buildDescriptorStore = function(){
-                    return buildSetDescriptor({
-                        TARGET: target,
-                        PROPERTY: property,
-                        DESC: descName,
-                    }).expression;
-                };
+                acc = acc.concat(
+                    t.callExpression(ensureApplyDecoratedDescriptorHelper(path, state), [
+                        target,
+                        property,
+                        t.arrayExpression(decorators.map(dec => dec.expression)),
+                        t.isObjectProperty(node) ? buildGetObjectInitializer({
+                            TEMP: path.scope.generateDeclaredUidIdentifier('init'),
+                            TARGET: target,
+                            PROPERTY: property,
+                        }).expression : buildGetDescriptor({
+                            TARGET: target,
+                            PROPERTY: property,
+                        }).expression,
+                        target,
+                    ])
+                );
             }
 
-            return acc.concat(
-                decorators
-                    .map(dec => dec.expression)
-                    .reverse()
-                    .reduce(buildDecoratorCall, t.assignmentExpression('=', descName, buildDescriptorCreate())),
-                buildDescriptorStore()
-            );
+            return acc;
         }, []);
 
         return t.sequenceExpression([
@@ -283,6 +307,23 @@ export default function({types: t}){
                 const decoratedObject = applyEnsureOrdering(path) || applyObjectDecorators(path, state);
 
                 if (decoratedObject) path.replaceWith(decoratedObject);
+            },
+
+            AssignmentExpression(path, state){
+                if (!state.initializerWarningHelper) return;
+
+                if (!path.get('left').isMemberExpression()) return;
+                if (!path.get('left.object').isThisExpression()) return;
+                if (!path.get('left.property').isIdentifier()) return;
+                if (!path.get('right').isCallExpression()) return;
+                if (!path.get('right.callee').isIdentifier({name: state.initializerWarningHelper.name})) return;
+
+                path.replaceWith(t.callExpression(ensureInitializerDefineProp(path, state), [
+                    path.get('left.object').node,
+                    t.stringLiteral(path.get('left.property').node.name),
+                    path.get('right.arguments')[0].node,
+                    path.get('right.arguments')[1].node,
+                ]));
             },
         }
     };
