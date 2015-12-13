@@ -99,7 +99,9 @@ describe('decorators', function(){
         describe('prototype methods', function(){
             it('should support numeric props', function(){
                 function dec(target, name, descriptor){
+                    expect(target).to.be.ok;
                     expect(name).to.eql(4);
+                    expect(descriptor).to.be.an('object');
                 }
 
                 class Example {
@@ -112,7 +114,9 @@ describe('decorators', function(){
 
             it('should support string props', function(){
                 function dec(target, name, descriptor){
+                    expect(target).to.be.ok;
                     expect(name).to.eql("str");
+                    expect(descriptor).to.be.an('object');
                 }
 
                 class Example {
@@ -125,6 +129,10 @@ describe('decorators', function(){
 
             it('should allow returning a descriptor', function(){
                 function dec(target, name, descriptor){
+                    expect(target).to.be.ok;
+                    expect(name).to.be.a('string');
+                    expect(descriptor).to.be.an('object');
+
                     target.decoratedProps = (target.decoratedProps || []).concat([name]);
 
                     let value = descriptor.value;
@@ -238,6 +246,10 @@ describe('decorators', function(){
 
             it('should allow mutating the original descriptor', function(){
                 function dec(target, name, descriptor){
+                    expect(target).to.be.ok;
+                    expect(name).to.be.a('string');
+                    expect(descriptor).to.be.an('object');
+
                     target.decoratedProps = (target.decoratedProps || []).concat([name]);
 
                     let value = descriptor.value;
@@ -353,7 +365,9 @@ describe('decorators', function(){
         describe('static methods', function(){
             it('should support numeric props', function(){
                 function dec(target, name, descriptor){
+                    expect(target).to.be.ok;
                     expect(name).to.eql(4);
+                    expect(descriptor).to.be.an('object');
                 }
 
                 class Example {
@@ -366,7 +380,9 @@ describe('decorators', function(){
 
             it('should support string props', function(){
                 function dec(target, name, descriptor){
+                    expect(target).to.be.ok;
                     expect(name).to.eql("str");
+                    expect(descriptor).to.be.an('object');
                 }
 
                 class Example {
@@ -379,6 +395,10 @@ describe('decorators', function(){
 
             it('should allow returning a descriptor', function(){
                 function dec(target, name, descriptor){
+                    expect(target).to.be.ok;
+                    expect(name).to.be.a('string');
+                    expect(descriptor).to.be.an('object');
+
                     target.decoratedProps = (target.decoratedProps || []).concat([name]);
 
                     let value = descriptor.value;
@@ -490,6 +510,10 @@ describe('decorators', function(){
 
             it('should allow mutating the original descriptor', function(){
                 function dec(target, name, descriptor){
+                    expect(target).to.be.ok;
+                    expect(name).to.be.a('string');
+                    expect(descriptor).to.be.an('object');
+
                     target.decoratedProps = (target.decoratedProps || []).concat([name]);
 
                     let value = descriptor.value;
@@ -617,6 +641,10 @@ describe('decorators', function(){
 
             it('should allow returning a descriptor', function(){
                 function dec(target, name, descriptor){
+                    expect(target).to.be.ok;
+                    expect(name).to.be.a('string');
+                    expect(descriptor).to.be.an('object');
+
                     target.decoratedProps = (target.decoratedProps || []).concat([name]);
 
                     let initializer = descriptor.initializer;
@@ -713,6 +741,10 @@ describe('decorators', function(){
 
             it('should allow mutating the original descriptor', function(){
                 function dec(target, name, descriptor){
+                    expect(target).to.be.ok;
+                    expect(name).to.be.a('string');
+                    expect(descriptor).to.be.an('object');
+
                     target.decoratedProps = (target.decoratedProps || []).concat([name]);
 
                     let initializer = descriptor.initializer;
@@ -824,6 +856,10 @@ describe('decorators', function(){
 
             it('should allow returning a descriptor', function(){
                 function dec(target, name, descriptor){
+                    expect(target).to.be.ok;
+                    expect(name).to.be.a('string');
+                    expect(descriptor).to.be.an('object');
+
                     target.decoratedProps = (target.decoratedProps || []).concat([name]);
 
                     let initializer = descriptor.initializer;
@@ -920,6 +956,10 @@ describe('decorators', function(){
 
             it('should allow mutating the original descriptor', function(){
                 function dec(target, name, descriptor){
+                    expect(target).to.be.ok;
+                    expect(name).to.be.a('string');
+                    expect(descriptor).to.be.an('object');
+
                     target.decoratedProps = (target.decoratedProps || []).concat([name]);
 
                     let initializer = descriptor.initializer;
@@ -1079,7 +1119,9 @@ describe('decorators', function(){
         describe('methods', function(){
             it('should support numeric props', function(){
                 function dec(target, name, descriptor){
+                    expect(target).to.be.ok;
                     expect(name).to.eql(4);
+                    expect(descriptor).to.be.an('object');
                 }
 
                 const inst = {
@@ -1092,7 +1134,9 @@ describe('decorators', function(){
 
             it('should support string props', function(){
                 function dec(target, name, descriptor){
+                    expect(target).to.be.ok;
                     expect(name).to.eql("str");
+                    expect(descriptor).to.be.an('object');
                 }
 
                 const inst = {
@@ -1105,6 +1149,10 @@ describe('decorators', function(){
 
             it('should allow returning a descriptor', function(){
                 function dec(target, name, descriptor){
+                    expect(target).to.be.ok;
+                    expect(name).to.be.a('string');
+                    expect(descriptor).to.be.an('object');
+
                     target.decoratedProps = (target.decoratedProps || []).concat([name]);
 
                     let value = descriptor.value;
@@ -1216,6 +1264,10 @@ describe('decorators', function(){
 
             it('should allow mutating the original descriptor', function(){
                 function dec(target, name, descriptor){
+                    expect(target).to.be.ok;
+                    expect(name).to.be.a('string');
+                    expect(descriptor).to.be.an('object');
+
                     target.decoratedProps = (target.decoratedProps || []).concat([name]);
 
                     let value = descriptor.value;
@@ -1329,7 +1381,9 @@ describe('decorators', function(){
         describe('properties', function(){
             it('should support numeric props', function(){
                 function dec(target, name, descriptor){
+                    expect(target).to.be.ok;
                     expect(name).to.eql(4);
+                    expect(descriptor).to.be.an('object');
                 }
 
                 const inst = {
@@ -1340,7 +1394,9 @@ describe('decorators', function(){
 
             it('should support string props', function(){
                 function dec(target, name, descriptor){
+                    expect(target).to.be.ok;
                     expect(name).to.eql("str");
+                    expect(descriptor).to.be.an('object');
                 }
 
                 const inst = {
@@ -1351,6 +1407,10 @@ describe('decorators', function(){
 
             it('should allow returning a descriptor', function(){
                 function dec(target, name, descriptor){
+                    expect(target).to.be.ok;
+                    expect(name).to.be.a('string');
+                    expect(descriptor).to.be.an('object');
+
                     target.decoratedProps = (target.decoratedProps || []).concat([name]);
 
                     let initializer = descriptor.initializer;
@@ -1446,6 +1506,10 @@ describe('decorators', function(){
 
             it('should allow mutating the original descriptor', function(){
                 function dec(target, name, descriptor){
+                    expect(target).to.be.ok;
+                    expect(name).to.be.a('string');
+                    expect(descriptor).to.be.an('object');
+
                     target.decoratedProps = (target.decoratedProps || []).concat([name]);
 
                     let initializer = descriptor.initializer;
