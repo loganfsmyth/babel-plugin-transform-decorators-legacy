@@ -78,7 +78,7 @@ export default function({types: t}){
      * Given a class expression with class-level decorators, create a new expression
      * with the proper decorated behavior.
      */
-    function applyClassDecorators(classPath){
+    function applyClassDecorators(classPath, state){
         const decorators = classPath.node.decorators || [];
         classPath.node.decorators = null;
 
@@ -102,34 +102,34 @@ export default function({types: t}){
      * Given a class expression with method-level decorators, create a new expression
      * with the proper decorated behavior.
      */
-    function applyMethodDecorators(path){
+    function applyMethodDecorators(path, state){
         const hasMethodDecorators = path.node.body.body.some(function(node){
             return (node.decorators || []).length > 0;
         });
 
         if (!hasMethodDecorators) return;
 
-        return applyTargetDecorators(path, path.node.body.body);
+        return applyTargetDecorators(path, state, path.node.body.body);
     }
 
     /**
      * Given an object expression with property decorators, create a new expression
      * with the proper decorated behavior.
      */
-    function applyObjectDecorators(path){
+    function applyObjectDecorators(path, state){
         const hasMethodDecorators = path.node.properties.some(function(node){
             return (node.decorators || []).length > 0;
         });
 
         if (!hasMethodDecorators) return;
 
-        return applyTargetDecorators(path, path.node.properties);
+        return applyTargetDecorators(path, state, path.node.properties);
     }
 
     /**
      * A helper to pull out property decorators into a sequence expression.
      */
-    function applyTargetDecorators(path, decoratedProps){
+    function applyTargetDecorators(path, state, decoratedProps){
         const descName = path.scope.generateDeclaredUidIdentifier('desc');
         const valueTemp = path.scope.generateDeclaredUidIdentifier('value');
 
@@ -272,15 +272,15 @@ export default function({types: t}){
                   t.variableDeclarator(ref, t.toExpression(node))
                 ]));
             },
-            ClassExpression(path){
+            ClassExpression(path, state){
                 // Create a replacement for the class node if there is one. We do one pass to replace classes with
                 // class decorators, and a second pass to process method decorators.
-                const decoratedClass = applyEnsureOrdering(path) || applyClassDecorators(path) || applyMethodDecorators(path);
+                const decoratedClass = applyEnsureOrdering(path) || applyClassDecorators(path, state) || applyMethodDecorators(path, state);
 
                 if (decoratedClass) path.replaceWith(decoratedClass);
             },
-            ObjectExpression(path){
-                const decoratedObject = applyEnsureOrdering(path) || applyObjectDecorators(path);
+            ObjectExpression(path, state){
+                const decoratedObject = applyEnsureOrdering(path) || applyObjectDecorators(path, state);
 
                 if (decoratedObject) path.replaceWith(decoratedObject);
             },
