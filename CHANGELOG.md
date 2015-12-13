@@ -1,6 +1,11 @@
 
 # Changelog
 
+## v1.3.0
+
+* Class property support for descriptors where originally only the value was used
+* Static class property support
+
 ## v1.2.0
 
 * Support class properties with no initializer, e.g. @decorator a;

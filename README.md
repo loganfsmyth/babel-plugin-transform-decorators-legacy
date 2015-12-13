@@ -13,11 +13,19 @@ Beware, this plugin is a best effort to maintain feature parity with Babel 5, bu
 are slight differences if you were relied on side-effects between decorators in some
 cases.
 
-## Limitations
+## Why "legacy"?
 
-* Currently this implementation discards changes to `enumerable`, `configurable` and `writable`
-when decorating class properties.
-* Currently decorating static class properties is unsupported. Support will be added shortly.
+Decorators are still only a relatively new proposal, and they are (at least currently) still
+in flux. Many people have started to use them in their original form, where each decorator
+is essentially a function of the form
+
+    function(target, property, descriptor){}
+
+This form is very likely to change moving forward, and Babel 6 did not wish to support
+the older form when it was known that it would change in the future. As such, I created this
+plugin to help people transition to Babel 6 without requiring them to drop their decorators
+or requiring them to wait for the new proposal update and then update all their code.
+
 
 ## License
 
