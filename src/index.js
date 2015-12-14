@@ -45,7 +45,7 @@ const buildInitializerDefineProperty = template(`
 
 const buildApplyDecoratedDescriptor = template(`
     function NAME(target, property, decorators, descriptor, context){
-        let desc = {
+        var desc = {
             enumerable: !!descriptor.enumerable,
             configurable: !!descriptor.configurable,
         };
@@ -68,7 +68,9 @@ const buildApplyDecoratedDescriptor = template(`
         }
 
         if (desc.initializer === void 0){
-            Object.defineProperty(target, property, desc);
+            // This is a hack to avoid this being processed by 'transform-runtime'.
+            // See issue #9.
+            Object['define' + 'Property'](target, property, desc);
             desc = null;
         }
 
