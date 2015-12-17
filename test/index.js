@@ -33,7 +33,7 @@ describe('decorators', function(){
                 expect(calls).to.eql([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
             });
 
-            it('should call descriptors in reverse order per-method', function(){
+            it('should call decorators in reverse order per-method', function(){
                 const calls = [];
                 function dec(id){
                     return function(){
@@ -639,6 +639,36 @@ describe('decorators', function(){
                 expect(inst.prop).to.be.undefined;
             });
 
+            it('should support mutating an initialzer into an accessor', function(){
+                function dec(target, name, descriptor){
+                    expect(target).to.be.ok;
+                    expect(name).to.eql("prop");
+                    expect(descriptor).to.be.an('object');
+
+                    let {initializer} = descriptor;
+                    delete descriptor.initializer;
+                    delete descriptor.writable;
+
+                    let value;
+                    descriptor.get = function(){
+                        if (initializer){
+                            value = '__' + initializer.call(this) + '__';
+                            initializer = null;
+                        }
+                        return value;
+                    };
+                }
+
+                class Example {
+                    @dec
+                    prop = 3;
+                }
+
+                let inst = new Example();
+
+                expect(inst.prop).to.eql('__3__');
+            });
+
             it('should allow returning a descriptor', function(){
                 function dec(target, name, descriptor){
                     expect(target).to.be.ok;
@@ -852,6 +882,34 @@ describe('decorators', function(){
 
                 expect(Example).to.have.ownProperty('prop');
                 expect(Example.prop).to.be.undefined;
+            });
+
+            it('should support mutating an initialzer into an accessor', function(){
+                function dec(target, name, descriptor){
+                    expect(target).to.be.ok;
+                    expect(name).to.eql("prop");
+                    expect(descriptor).to.be.an('object');
+
+                    let {initializer} = descriptor;
+                    delete descriptor.initializer;
+                    delete descriptor.writable;
+
+                    let value;
+                    descriptor.get = function(){
+                        if (initializer){
+                            value = '__' + initializer.call(this) + '__';
+                            initializer = null;
+                        }
+                        return value;
+                    };
+                }
+
+                class Example {
+                    @dec
+                    static prop = 3;
+                }
+
+                expect(Example.prop).to.eql('__3__');
             });
 
             it('should allow returning a descriptor', function(){
@@ -1403,6 +1461,34 @@ describe('decorators', function(){
                     @dec
                     "str": 1
                 };
+            });
+
+            it('should support mutating an initialzer into an accessor', function(){
+                function dec(target, name, descriptor){
+                    expect(target).to.be.ok;
+                    expect(name).to.eql("prop");
+                    expect(descriptor).to.be.an('object');
+
+                    let {initializer} = descriptor;
+                    delete descriptor.initializer;
+                    delete descriptor.writable;
+
+                    let value;
+                    descriptor.get = function(){
+                        if (initializer){
+                            value = '__' + initializer.call(this) + '__';
+                            initializer = null;
+                        }
+                        return value;
+                    };
+                }
+
+                let inst = {
+                    @dec
+                    prop: 3
+                };
+
+                expect(inst.prop).to.eql('__3__');
             });
 
             it('should allow returning a descriptor', function(){

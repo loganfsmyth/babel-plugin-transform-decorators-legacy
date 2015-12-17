@@ -45,17 +45,14 @@ const buildInitializerDefineProperty = template(`
 
 const buildApplyDecoratedDescriptor = template(`
     function NAME(target, property, decorators, descriptor, context){
-        var desc = {
-            enumerable: !!descriptor.enumerable,
-            configurable: !!descriptor.configurable,
-        };
-        if ('value' in descriptor || 'initializer' in descriptor){
+        var desc = {};
+        Object.keys(descriptor).forEach(function(key){
+            desc[key] = descriptor[key];
+        });
+        desc.enumerable = !!desc.enumerable;
+        desc.configurable = !!desc.configurable;
+        if ('value' in desc || desc.initializer){
             desc.writable = true;
-            desc.initializer = descriptor.initializer;
-            desc.value = descriptor.value;
-        } else {
-            desc.get = descriptor.get;
-            desc.set = descriptor.set;
         }
 
         desc = decorators.slice().reverse().reduce(function(desc, decorator){
