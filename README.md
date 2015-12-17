@@ -25,7 +25,7 @@ This plugin is a best effort to be compatible with Babel 5's transpiler output, 
 are a few things that were difficult to reproduce, and a few things that were simply incorrect
 in Babel 5 with respect to the decorators proposal.
 
-Two main things to mention as differences, though not what I'd actually see as problems:
+Two main things to mention as differences, though not things you are likely to encounter:
 
 1. Decorators expressions are evaluated top to bottom, and executed bottom to top. e.g.
 
@@ -60,7 +60,7 @@ Two main things to mention as differences, though not what I'd actually see as p
     executed 1
     ```
 
-    which is what the spec dictates as the currect behavior and was incorrect in Babel 5.
+    which is what the spec dictates as the correct behavior and was incorrect in Babel 5.
 
 2. Static class property initializers are evaluated once up front.
 
