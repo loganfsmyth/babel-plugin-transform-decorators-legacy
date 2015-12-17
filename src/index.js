@@ -46,7 +46,7 @@ const buildInitializerDefineProperty = template(`
 const buildApplyDecoratedDescriptor = template(`
     function NAME(target, property, decorators, descriptor, context){
         var desc = {};
-        Object.keys(descriptor).forEach(function(key){
+        Object['ke' + 'ys'](descriptor).forEach(function(key){
             desc[key] = descriptor[key];
         });
         desc.enumerable = !!desc.enumerable;
