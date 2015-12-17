@@ -1,6 +1,10 @@
 
 # Changelog
 
+## v1.3.2
+
+* Fix a small bug which required the explicit deletion of `descriptor.value` when converting an initializer to an accessor.
+
 ## v1.3.1
 
 * With the new split-out helpers in 1.3.0, Babel's `transform-runtime` was injecting the import statements too late. For now we avoid this by not allowing it to be rewritten by the transform.
