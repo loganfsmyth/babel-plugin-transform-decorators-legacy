@@ -1,6 +1,10 @@
 
 # Changelog
 
+## v1.3.3
+
+* Fix same bug as fixed 1.3.1, except introduced for a different reason this time around.
+
 ## v1.3.2
 
 * Fix a small bug which required the explicit deletion of `descriptor.value` when converting an initializer to an accessor.
