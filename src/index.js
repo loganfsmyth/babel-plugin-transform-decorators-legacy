@@ -308,7 +308,6 @@ export default function({types: t}){
                 if (!state.initializerWarningHelper) return;
 
                 if (!path.get('left').isMemberExpression()) return;
-                if (!path.get('left.object').isThisExpression()) return;
                 if (!path.get('left.property').isIdentifier()) return;
                 if (!path.get('right').isCallExpression()) return;
                 if (!path.get('right.callee').isIdentifier({name: state.initializerWarningHelper.name})) return;
