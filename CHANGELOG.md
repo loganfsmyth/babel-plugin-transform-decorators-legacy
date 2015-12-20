@@ -1,6 +1,10 @@
 
 # Changelog
 
+## v1.3.4
+
+* Properly support decorating class properties on subclasses.
+
 ## v1.3.3
 
 * Fix same bug as fixed 1.3.1, except introduced for a different reason this time around.
