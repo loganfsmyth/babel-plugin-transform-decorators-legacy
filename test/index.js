@@ -637,6 +637,25 @@ describe('decorators', function(){
                 let inst = new Example();
                 expect(inst).to.have.ownProperty('prop');
                 expect(inst.prop).to.be.undefined;
+                expect(Object.getOwnPropertyDescriptor(inst, 'prop').writable).to.be.true;
+            });
+
+            it('should support decorating properties that have prototype property and no initializer', function() {
+                function dec(target, name, descriptor){
+
+                }
+
+                class Example {
+                    @dec prop;
+                }
+                Example.prototype.prop = 123;
+
+                let inst = new Example();
+                expect(inst).to.have.ownProperty('prop');
+                expect(inst.prop).to.eql(123);
+                Example.prototype.prop = 234;
+                expect(inst.prop).to.eql(123);
+                expect(Object.getOwnPropertyDescriptor(inst, 'prop').writable).to.be.true;
             });
 
             it('should support mutating an initialzer into an accessor', function(){
