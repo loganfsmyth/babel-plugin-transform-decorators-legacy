@@ -33,13 +33,19 @@ const buildInitializerWarningHelper = template(`
 const buildInitializerDefineProperty = template(`
     function NAME(target, property, descriptor, context){
         if (!descriptor) return;
-
-        Object.defineProperty(target, property, {
-            enumerable: descriptor.enumerable,
-            configurable: descriptor.configurable,
-            writable: descriptor.writable,
-            value: descriptor.initializer ? descriptor.initializer.call(context) : void 0,
-        });
+        const desc = {
+          enumerable: descriptor.enumerable,
+          configurable: descriptor.configurable,
+          writable: descriptor.writable
+        };
+        if (descriptor.initializer) {
+          desc.value = descriptor.initializer ? descriptor.initializer.call(context) : void 0;
+        } else {
+          desc.get = descriptor.get;
+          desc.set = descriptor.set;
+          delete desc.writable;
+        }
+        Object.defineProperty(target, property, desc);
     }
 `);
 
