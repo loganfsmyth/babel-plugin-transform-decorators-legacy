@@ -6,6 +6,16 @@ This is a plugin for Babel 6 that is meant to replicate the old decorator behavi
 Babel 5 in order to allow people to more easily transition to Babel 6 without needing to
 be blocked on updates to the decorator proposal or for Babel to re-implement it.
 
+## Installation & Usage
+
+    $ npm install babel-plugin-transform-decorators-legacy
+    
+Add the following line to your .babelrc file:
+
+    {
+        "plugins": ["babel-plugin-transform-decorators-legacy"]
+    }
+
 ## Why "legacy"?
 
 Decorators are still only a relatively new proposal, and they are (at least currently) still
