@@ -15,6 +15,25 @@ Add the following line to your .babelrc file:
     {
         "plugins": ["babel-plugin-transform-decorators-legacy"]
     }
+    
+#### NOTE: Order of Plugins Matters!
+If you are including your plugins manually and using `transform-class-properties`, make sure that `transform-decorators-legacy` comes *before* `transform-class-properties`.
+
+```js
+/// WRONG
+
+"plugins": [
+  "transform-class-properties",
+  "transform-decorators-legacy"
+]
+
+// RIGHT
+
+"plugins": [
+  "transform-decorators-legacy",
+  "transform-class-properties"
+]
+```
 
 ## Why "legacy"?
 
