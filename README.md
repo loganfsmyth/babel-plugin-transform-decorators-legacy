@@ -13,7 +13,7 @@ be blocked on updates to the decorator proposal or for Babel to re-implement it.
 Add the following line to your .babelrc file:
 
     {
-        "plugins": ["babel-plugin-transform-decorators-legacy"]
+        "plugins": ["transform-decorators-legacy"]
     }
     
 #### NOTE: Order of Plugins Matters!
