@@ -1141,6 +1141,29 @@ describe('decorators', function(){
                 expect(descs._.configurable).to.be.false;
                 expect(Example._).to.eql('__8__');
             });
+
+            it('should support being an instance of the decorated container class', function() {
+                function dec() {
+
+                }
+
+                @dec
+                class Example {
+                    static prop = new Example();
+                }
+
+                expect(Example).to.have.ownProperty('prop');
+                expect(Example.prop).to.be.an.instanceof(Example);
+            });
+
+            it('should support being an instance of the undecorated container class', function() {
+                class Example {
+                    static prop = new Example();
+                }
+
+                expect(Example).to.have.ownProperty('prop');
+                expect(Example.prop).to.be.an.instanceof(Example);
+            });
         });
     });
 
