@@ -8,7 +8,7 @@ be blocked on updates to the decorator proposal or for Babel to re-implement it.
 
 ## Installation & Usage
 
-    $ npm install babel-plugin-transform-decorators-legacy
+    $ npm install --save-dev babel-plugin-transform-decorators-legacy
     
 Add the following line to your .babelrc file:
 
