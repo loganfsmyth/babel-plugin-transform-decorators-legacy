@@ -55,7 +55,7 @@ const buildApplyDecoratedDescriptor = template(`
             desc.writable = true;
         }
 
-        desc = decorators.slice().reverse().reduce(function(desc, decorator){
+        desc = decorators.reduceRight(function(desc, decorator){
             return decorator(target, property, desc) || desc;
         }, desc);
 
