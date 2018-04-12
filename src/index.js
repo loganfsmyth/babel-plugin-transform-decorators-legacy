@@ -35,15 +35,15 @@ const buildInitializerDefineProperty = template(`
         if (!descriptor) return;
 
         const value = descriptor.initializer ? descriptor.initializer.call(context) : void 0;
-        if (property in context) {
-            context[property] = value;
-        } else {
+        if (!(property in context)) {
             Object.defineProperty(target, property, {
                 enumerable: descriptor.enumerable,
                 configurable: descriptor.configurable,
                 writable: descriptor.writable,
                 value: value,
             });
+        } else if (descriptor.writable || descriptor.set) {
+            context[property] = value;
         }
     }
 `);
