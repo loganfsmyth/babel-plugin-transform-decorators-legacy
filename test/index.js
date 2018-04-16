@@ -707,114 +707,20 @@ describe('decorators', function(){
 
                     target.decoratedProps = (target.decoratedProps || []).concat([name]);
 
+                    let accessorValue;
                     let initializer = descriptor.initializer;
-                    return {
+                    let isAccessor = name.indexOf('accessor') !== -1;
+                    return Object.assign({
                         enumerable: name.indexOf('enum') !== -1,
                         configurable: name.indexOf('conf') !== -1,
-                        writable: name.indexOf('write') !== -1,
                         initializer: function(...args){
                             return '__' + initializer.apply(this, args) + '__';
                         },
-                    };
-                }
-
-                class Example {
-                    @dec
-                    enumconfwrite = 1;
-
-                    @dec
-                    enumconf = 2;
-
-                    @dec
-                    enumwrite = 3;
-
-                    @dec
-                    enum = 4;
-
-                    @dec
-                    confwrite = 5;
-
-                    @dec
-                    conf = 6;
-
-                    @dec
-                    write = 7;
-
-                    @dec
-                    _ = 8;
-                }
-                const inst = new Example();
-
-                expect(Example.prototype).to.have.ownProperty('decoratedProps');
-                expect(inst.decoratedProps).to.eql([
-                    "enumconfwrite",
-                    "enumconf",
-                    "enumwrite",
-                    "enum",
-                    "confwrite",
-                    "conf",
-                    "write",
-                    "_",
-                ]);
-
-                const descs = Object.getOwnPropertyDescriptors(inst);
-                expect(descs.enumconfwrite.enumerable).to.be.true;
-                expect(descs.enumconfwrite.writable).to.be.true;
-                expect(descs.enumconfwrite.configurable).to.be.true;
-                expect(inst.enumconfwrite).to.eql('__1__');
-
-                expect(descs.enumconf.enumerable).to.be.true;
-                expect(descs.enumconf.writable).to.be.false;
-                expect(descs.enumconf.configurable).to.be.true;
-                expect(inst.enumconf).to.eql('__2__');
-
-                expect(descs.enumwrite.enumerable).to.be.true;
-                expect(descs.enumwrite.writable).to.be.true;
-                expect(descs.enumwrite.configurable).to.be.false;
-                expect(inst.enumwrite).to.eql('__3__');
-
-                expect(descs.enum.enumerable).to.be.true;
-                expect(descs.enum.writable).to.be.false;
-                expect(descs.enum.configurable).to.be.false;
-                expect(inst.enum).to.eql('__4__');
-
-                expect(descs.confwrite.enumerable).to.be.false;
-                expect(descs.confwrite.writable).to.be.true;
-                expect(descs.confwrite.configurable).to.be.true;
-                expect(inst.confwrite).to.eql('__5__');
-
-                expect(descs.conf.enumerable).to.be.false;
-                expect(descs.conf.writable).to.be.false;
-                expect(descs.conf.configurable).to.be.true;
-                expect(inst.conf).to.eql('__6__');
-
-                expect(descs.write.enumerable).to.be.false;
-                expect(descs.write.writable).to.be.true;
-                expect(descs.write.configurable).to.be.false;
-                expect(inst.write).to.eql('__7__');
-
-                expect(descs._.enumerable).to.be.false;
-                expect(descs._.writable).to.be.false;
-                expect(descs._.configurable).to.be.false;
-                expect(inst._).to.eql('__8__');
-            });
-
-            it('should allow mutating the original descriptor', function(){
-                function dec(target, name, descriptor){
-                    expect(target).to.be.ok;
-                    expect(name).to.be.a('string');
-                    expect(descriptor).to.be.an('object');
-
-                    target.decoratedProps = (target.decoratedProps || []).concat([name]);
-
-                    let initializer = descriptor.initializer;
-                    Object.assign(descriptor, {
-                        enumerable: name.indexOf('enum') !== -1,
-                        configurable: name.indexOf('conf') !== -1,
+                    }, isAccessor ? {
+                        get(){ return accessorValue; },
+                        set(value){ accessorValue = value },
+                    } : {
                         writable: name.indexOf('write') !== -1,
-                        initializer: function(...args){
-                            return '__' + initializer.apply(this, args) + '__';
-                        },
                     });
                 }
 
@@ -841,7 +747,10 @@ describe('decorators', function(){
                     write = 7;
 
                     @dec
-                    _ = 8;
+                    accessor = 8;
+
+                    @dec
+                    _ = 9;
                 }
                 const inst = new Example();
 
@@ -854,6 +763,7 @@ describe('decorators', function(){
                     "confwrite",
                     "conf",
                     "write",
+                    "accessor",
                     "_",
                 ]);
 
@@ -893,10 +803,137 @@ describe('decorators', function(){
                 expect(descs.write.configurable).to.be.false;
                 expect(inst.write).to.eql('__7__');
 
+                expect(descs.accessor.enumerable).to.be.false;
+                expect(descs.accessor.writable).to.be.undefined;
+                expect(descs.accessor.configurable).to.be.false;
+                expect(descs.accessor.set).to.be.a('function');
+                expect(descs.accessor.get).to.be.a('function');
+                expect(inst.accessor).to.eql('__8__');
+
                 expect(descs._.enumerable).to.be.false;
                 expect(descs._.writable).to.be.false;
                 expect(descs._.configurable).to.be.false;
-                expect(inst._).to.eql('__8__');
+                expect(inst._).to.eql('__9__');
+            });
+
+            it('should allow mutating the original descriptor', function(){
+                function dec(target, name, descriptor){
+                    expect(target).to.be.ok;
+                    expect(name).to.be.a('string');
+                    expect(descriptor).to.be.an('object');
+
+                    target.decoratedProps = (target.decoratedProps || []).concat([name]);
+
+                    let accessorValue;
+                    let initializer = descriptor.initializer;
+                    let isAccessor = name.indexOf('accessor') !== -1;
+                    Object.assign(descriptor, {
+                        enumerable: name.indexOf('enum') !== -1,
+                        configurable: name.indexOf('conf') !== -1,
+                        writable: name.indexOf('write') !== -1,
+                        initializer: function(...args){
+                            return '__' + initializer.apply(this, args) + '__';
+                        },
+                    }, isAccessor && {
+                        get(){ return accessorValue; },
+                        set(value){ accessorValue = value },
+                    });
+
+                    if (isAccessor) {
+                        delete descriptor.writable;
+                    }
+                }
+
+                class Example {
+                    @dec
+                    enumconfwrite = 1;
+
+                    @dec
+                    enumconf = 2;
+
+                    @dec
+                    enumwrite = 3;
+
+                    @dec
+                    enum = 4;
+
+                    @dec
+                    confwrite = 5;
+
+                    @dec
+                    conf = 6;
+
+                    @dec
+                    write = 7;
+
+                    @dec
+                    accessor = 8;
+
+                    @dec
+                    _ = 9;
+                }
+                const inst = new Example();
+
+                expect(Example.prototype).to.have.ownProperty('decoratedProps');
+                expect(inst.decoratedProps).to.eql([
+                    "enumconfwrite",
+                    "enumconf",
+                    "enumwrite",
+                    "enum",
+                    "confwrite",
+                    "conf",
+                    "write",
+                    "accessor",
+                    "_",
+                ]);
+
+                const descs = Object.getOwnPropertyDescriptors(inst);
+                expect(descs.enumconfwrite.enumerable).to.be.true;
+                expect(descs.enumconfwrite.writable).to.be.true;
+                expect(descs.enumconfwrite.configurable).to.be.true;
+                expect(inst.enumconfwrite).to.eql('__1__');
+
+                expect(descs.enumconf.enumerable).to.be.true;
+                expect(descs.enumconf.writable).to.be.false;
+                expect(descs.enumconf.configurable).to.be.true;
+                expect(inst.enumconf).to.eql('__2__');
+
+                expect(descs.enumwrite.enumerable).to.be.true;
+                expect(descs.enumwrite.writable).to.be.true;
+                expect(descs.enumwrite.configurable).to.be.false;
+                expect(inst.enumwrite).to.eql('__3__');
+
+                expect(descs.enum.enumerable).to.be.true;
+                expect(descs.enum.writable).to.be.false;
+                expect(descs.enum.configurable).to.be.false;
+                expect(inst.enum).to.eql('__4__');
+
+                expect(descs.confwrite.enumerable).to.be.false;
+                expect(descs.confwrite.writable).to.be.true;
+                expect(descs.confwrite.configurable).to.be.true;
+                expect(inst.confwrite).to.eql('__5__');
+
+                expect(descs.conf.enumerable).to.be.false;
+                expect(descs.conf.writable).to.be.false;
+                expect(descs.conf.configurable).to.be.true;
+                expect(inst.conf).to.eql('__6__');
+
+                expect(descs.write.enumerable).to.be.false;
+                expect(descs.write.writable).to.be.true;
+                expect(descs.write.configurable).to.be.false;
+                expect(inst.write).to.eql('__7__');
+
+                expect(descs.accessor.enumerable).to.be.false;
+                expect(descs.accessor.writable).to.be.undefined;
+                expect(descs.accessor.configurable).to.be.false;
+                expect(descs.accessor.set).to.be.a('function');
+                expect(descs.accessor.get).to.be.a('function');
+                expect(inst.accessor).to.eql('__8__');
+
+                expect(descs._.enumerable).to.be.false;
+                expect(descs._.writable).to.be.false;
+                expect(descs._.configurable).to.be.false;
+                expect(inst._).to.eql('__9__');
             });
         });
 
