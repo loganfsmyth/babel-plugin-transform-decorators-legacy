@@ -6,16 +6,35 @@ This is a plugin for Babel 6 that is meant to replicate the old decorator behavi
 Babel 5 in order to allow people to more easily transition to Babel 6 without needing to
 be blocked on updates to the decorator proposal or for Babel to re-implement it.
 
+## Babel >= 7.x
+
+This plugin is specifically for Babel 6.x. If you're using Babel 7, this plugin is not for you.
+Babel 7's `@babel/plugin-proposal-decorators` officially supports the same logic that this
+plugin has, but integrates better with Babel 7's other plugins. You can enable this with
+
+```json
+{
+  "plugins": [
+    ["@babel/plugin-proposal-decorators", { "legacy": true }],
+  ]
+}
+```
+in your Babel configuration. Note that `legacy: true` is specifically needed if you
+want to get the same behavior as `transform-decorators-legacy` because there
+are newer versions of the decorator specification coming out, and they do not
+behave the same way as this plugin does.
+
+
 ## Installation & Usage
 
     $ npm install --save-dev babel-plugin-transform-decorators-legacy
-    
+
 Add the following line to your .babelrc file:
 
     {
         "plugins": ["transform-decorators-legacy"]
     }
-    
+
 #### NOTE: Order of Plugins Matters!
 If you are including your plugins manually and using `transform-class-properties`, make sure that `transform-decorators-legacy` comes *before* `transform-class-properties`.
 
