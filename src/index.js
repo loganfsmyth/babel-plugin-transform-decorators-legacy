@@ -171,11 +171,20 @@ export default function({types: t}){
      * with the proper decorated behavior.
      */
     function applyMethodDecorators(path, state){
-        const hasMethodDecorators = path.node.body.body.some(function(node){
-            return (node.decorators || []).length > 0;
+        const nodesWithDecoratorArray = path.node.body.body.filter(function(node) {
+            return Boolean(node.decorators);
+        });
+        const hasMethodDecorators = nodesWithDecoratorArray.some(function(node){
+            return node.decorators.length > 0;
         });
 
-        if (!hasMethodDecorators) return;
+        if (!hasMethodDecorators) {
+          // need to nullify decorators property for Babel 6 to not throw
+          nodesWithDecoratorArray.forEach(function(node) {
+            node.decorators = null;
+          });
+          return;
+        };
 
         return applyTargetDecorators(path, state, path.node.body.body);
     }
@@ -185,11 +194,20 @@ export default function({types: t}){
      * with the proper decorated behavior.
      */
     function applyObjectDecorators(path, state){
-        const hasMethodDecorators = path.node.properties.some(function(node){
-            return (node.decorators || []).length > 0;
+        const nodesWithDecoratorArray = path.node.properties.filter(function(node) {
+            return Boolean(node.decorators);
+        });
+        const hasMethodDecorators = nodesWithDecoratorArray.some(function(node){
+            return node.decorators.length > 0;
         });
 
-        if (!hasMethodDecorators) return;
+        if (!hasMethodDecorators) {
+          // need to nullify decorators property for Babel 6 to not throw
+          nodesWithDecoratorArray.forEach(function(node) {
+            node.decorators = null;
+          });
+          return;
+        }
 
         return applyTargetDecorators(path, state, path.node.properties);
     }
