@@ -75,6 +75,10 @@ const buildApplyDecoratedDescriptor = template(`
     }
 `);
 
+const buildStaticPropValueAssignment = template(`
+    CLASS_REF.STATIC_PROP = VALUE;
+`);
+
 export default function({types: t}){
     /**
      * Add a helper to take an initial descriptor, apply some decorators to it, and optionally
@@ -287,14 +291,33 @@ export default function({types: t}){
 
                 const ref = node.id || path.scope.generateUidIdentifier("class");
 
+                const staticProps = path.scope.getBinding(ref.name).referencePaths
+                    .map(refPath => refPath.context.parentPath.context.parentPath)
+                    .filter(container => container.isClassProperty() && container.node.static);
+
+                staticProps.forEach(({node}) => {
+                    const expr = buildStaticPropValueAssignment({
+                        CLASS_REF: ref,
+                        STATIC_PROP: node.key,
+                        VALUE: node.value
+                    });
+
+                    path.insertAfter(expr);
+                });
+
+                staticProps.forEach(prop => prop.remove());
+
                 path.replaceWith(t.variableDeclaration("let", [
-                  t.variableDeclarator(ref, t.toExpression(node))
+                    t.variableDeclarator(ref, t.toExpression(node))
                 ]));
             },
             ClassExpression(path, state){
                 // Create a replacement for the class node if there is one. We do one pass to replace classes with
                 // class decorators, and a second pass to process method decorators.
-                const decoratedClass = applyEnsureOrdering(path) || applyClassDecorators(path, state) || applyMethodDecorators(path, state);
+                const decoratedClass =
+                    applyEnsureOrdering(path) ||
+                    applyClassDecorators(path, state) ||
+                    applyMethodDecorators(path, state);
 
                 if (decoratedClass) path.replaceWith(decoratedClass);
             },
