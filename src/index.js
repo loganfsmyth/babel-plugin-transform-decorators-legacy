@@ -222,9 +222,10 @@ export default function({types: t}){
             if (t.isClassProperty(node, {static: false})){
                 let descriptor = path.scope.generateDeclaredUidIdentifier('descriptor');
 
-                const initializer = node.value ?
-                        t.functionExpression(null, [], t.blockStatement([t.returnStatement(node.value)])) :
-                        t.nullLiteral();
+                const initializerValue = node.value ?
+                    node.value :
+                    t.memberExpression(t.thisExpression(), t.identifier(property.value));
+                const initializer = t.functionExpression(null, [], t.blockStatement([t.returnStatement(initializerValue)]));
                 node.value = t.callExpression(ensureInitializerWarning(path, state), [descriptor, t.thisExpression()]);
 
                 acc = acc.concat([
