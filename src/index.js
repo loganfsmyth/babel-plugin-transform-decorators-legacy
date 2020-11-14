@@ -34,12 +34,15 @@ const buildInitializerDefineProperty = template(`
     function NAME(target, property, descriptor, context){
         if (!descriptor) return;
 
-        Object.defineProperty(target, property, {
-            enumerable: descriptor.enumerable,
-            configurable: descriptor.configurable,
-            writable: descriptor.writable,
-            value: descriptor.initializer ? descriptor.initializer.call(context) : void 0,
-        });
+        var initializer = descriptor.initializer;
+        if (initializer && !(descriptor.set || descriptor.get)) {
+            descriptor.value = initializer.call(context);
+        }
+        
+        Object.defineProperty(target, property, descriptor);
+        if (initializer && descriptor.set) {
+            target[property] = initializer.call(context);
+        }
     }
 `);
 
